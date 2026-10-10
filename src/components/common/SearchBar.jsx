@@ -7,7 +7,7 @@ export default function SearchBar() {
 
   return (
     <label className="search-box">
-      <AppIcon name="solar:magnifer-linear" size={24} />
+      <AppIcon name="fa7-solid:search" size={24} />
 
       <input
         type="text"

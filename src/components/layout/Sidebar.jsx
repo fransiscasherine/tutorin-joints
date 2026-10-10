@@ -5,10 +5,10 @@ import mascot from "../../assets/mascot.png";
 const menu = [
   { label: "Beranda", icon: "fa7-solid:home" },
   { label: "Cari mentor", icon: "fa7-solid:search" },
-  { label: "Mentor Favorit", icon: "solar:heart-linear" },
+  { label: "Mentor Favorit", icon: "fa7-regular:heart" },
   { label: "Sesi", icon: "fa7-solid:calendar" },
-  { label: "Riwayat Kredit", icon: "solar:wallet-linear" },
-  { label: "Shop", icon: "solar:shop-2-linear" },
+  { label: "Riwayat Kredit", icon: "fa7-solid:wallet" },
+  { label: "Shop", icon: "bx:store" },
   { label: "Akun", icon: "fa7-solid:user" },
 ];
 
