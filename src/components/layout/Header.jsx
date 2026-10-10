@@ -2,7 +2,7 @@ import { useState } from "react";
 import AppIcon from "../common/AppIcon";
 import UserProfile from "../common/UserProfile";
 
-export default function Header() {
+export default function Header({ onProfileClick, onShopClick }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   return (
@@ -10,8 +10,9 @@ export default function Header() {
       <div className="header-actions">
         <button
           className="icon-button"
-          aria-label="Marketplace"
-          onClick={() => alert("Marketplace tutor")}
+          aria-label="Shop Kredit"
+          title="Shop Kredit"
+          onClick={onShopClick}
         >
           <AppIcon name="solar:shop-2-bold" size={23} />
         </button>
@@ -33,7 +34,7 @@ export default function Header() {
           )}
         </div>
 
-        <UserProfile />
+        <UserProfile onClick={onProfileClick} />
       </div>
     </header>
   );

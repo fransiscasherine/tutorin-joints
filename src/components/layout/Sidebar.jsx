@@ -1,10 +1,14 @@
 import AppIcon from "../common/AppIcon";
 import NavbarItem from "./NavbarItem";
+import mascot from "../../assets/mascot.png";
 
 const menu = [
   { label: "Beranda", icon: "fa7-solid:home" },
-  { label: "Cari tutor", icon: "fa7-solid:search" },
+  { label: "Cari mentor", icon: "fa7-solid:search" },
+  { label: "Mentor Favorit", icon: "solar:heart-linear" },
   { label: "Sesi", icon: "fa7-solid:calendar" },
+  { label: "Riwayat Kredit", icon: "solar:wallet-linear" },
+  { label: "Shop", icon: "solar:shop-2-linear" },
   { label: "Akun", icon: "fa7-solid:user" },
 ];
 
@@ -41,18 +45,12 @@ export default function Sidebar({ active, setActive }) {
       </nav>
 
       <div className="teach-card">
-        <div className="mascot-scene">
-          <div className="mascot-orbit" />
-          <AppIcon name="noto:bear" size={95} className="mascot-bear" />
-          <AppIcon name="noto:green-book" size={36} className="mascot-book" />
-          <AppIcon name="solar:star-bold" size={20} className="mascot-star star-one" />
-          <AppIcon name="solar:star-bold" size={15} className="mascot-star star-two" />
-        </div>
+        <div className="mascot-scene"><img className="sidebar-mascot" src={mascot} alt="" width="139" height="116" /></div>
 
         <h3>Bersama, kita saling tumbuh!</h3>
         <p>Ajarkan apa yang kamu kuasai, pelajari apa yang kamu butuhkan.</p>
 
-        <button className="mini-cta" onClick={() => setActive("Jadi tutor")}>
+        <button className="mini-cta" onClick={() => setActive("Jadi mentor")}>
           Mulai Mengajar
           <AppIcon name="solar:alt-arrow-right-linear" size={17} />
         </button>
