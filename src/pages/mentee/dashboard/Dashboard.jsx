@@ -1,58 +1,9 @@
-import { useState } from "react";
 import AppIcon from "../../../components/common/AppIcon";
-
-const tutors = [
-  {
-    name: "Angela Wilkins",
-    subjects: "Matematika · Fisika",
-    rating: "4.9",
-    reviews: "124",
-    role: "Tutor Pro",
-    roleClass: "pro",
-    credits: 10,
-    avatar: "ph:user-circle-fill",
-  },
-  {
-    name: "Budi Santoso",
-    subjects: "Biologi · Kimia",
-    rating: "4.7",
-    reviews: "98",
-    role: "Mentor Tutor",
-    roleClass: "mentor",
-    credits: 10,
-    avatar: "ph:user-circle-fill",
-  },
-  {
-    name: "Citra Mandira",
-    subjects: "Sejarah · Geografi",
-    rating: "4.8",
-    reviews: "110",
-    role: "Active Tutor",
-    roleClass: "active",
-    credits: 10,
-    avatar: "ph:user-circle-fill",
-  },
-  {
-    name: "Dian Prasetya",
-    subjects: "Ekonomi · Akuntansi",
-    rating: "4.6",
-    reviews: "85",
-    role: "Starter Tutor",
-    roleClass: "starter",
-    credits: 10,
-    avatar: "ph:user-circle-fill",
-  },
-];
-
-const weeklyData = [
-  { day: "Sen", value: 15 },
-  { day: "Sel", value: 22 },
-  { day: "Rab", value: 30 },
-  { day: "Kam", value: 9 },
-  { day: "Jum", value: 27 },
-  { day: "Sab", value: 19 },
-  { day: "Min", value: 30 },
-];
+import MentorCard from "../../../components/common/MentorCard";
+import { dateKey, formatDate, useTutorData } from "../../../state/tutorStore";
+import { EmptyState } from "../../../components/common/ActivityUI";
+import { tutors } from "../../../state/tutors";
+import { isUpcomingSession } from "../sesi/sessionUtils";
 
 function WelcomeBanner({ setActive }) {
   return (
@@ -68,14 +19,14 @@ function WelcomeBanner({ setActive }) {
         </p>
 
         <div className="welcome-buttons">
-          <button className="button-yellow" onClick={() => setActive("Cari tutor")}>
+          <button className="button-yellow" onClick={() => setActive("Cari mentor")}>
             <AppIcon name="fa7-solid:search" size={24} />
-            Cari tutor sekarang
+            Cari mentor sekarang
           </button>
 
-          <button className="button-white" onClick={() => setActive("Jadi tutor")}>
+          <button className="button-white" onClick={() => setActive("Jadi mentor")}>
             <AppIcon name="fluent:hat-graduation-12-regular" size={23} />
-            Jadi tutor
+            Jadi mentor
           </button>
         </div>
       </div>
@@ -106,6 +57,9 @@ function SectionHeading({ icon, title, action, onAction }) {
 }
 
 function NextSession({ setActive }) {
+  const { sessions } = useTutorData();
+  const session = sessions.filter(isUpcomingSession)
+    .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))[0];
   return (
     <section className="sessions-section">
       <SectionHeading
@@ -115,148 +69,77 @@ function NextSession({ setActive }) {
         onAction={() => setActive("Sesi")}
       />
 
-      <article className="session-card">
+      {session ? <article className="session-card">
         <div className="session-avatar">
           <AppIcon name="fa7-solid:user" size={55} />
         </div>
 
         <div className="session-info">
-          <h3>Algoritma dan Pemrograman</h3>
-          <p>dengan Bill Smith</p>
+          <h3>{session.subject}</h3>
+          <p>{session.role === "mentor" ? `Mengajar ${session.learner}` : `Belajar dengan mentor ${session.tutor}`}</p>
 
           <div className="session-meta">
             <span className="meta-pill">
               <AppIcon name="fa7-solid:calendar" size={13} />
-              Rabu, 12 Mei 2026
+              {formatDate(session.date, { weekday: "long" })}
             </span>
 
             <span className="meta-pill">
               <AppIcon name="solar:clock-circle-bold" size={13} />
-              10:00 - 12:00
+              {session.time} WIB / {session.duration} menit
             </span>
           </div>
         </div>
 
         <button
           className="outline-button session-detail"
-          onClick={() => alert("Detail sesi Algoritma dan Pemrograman")}
+          onClick={() => setActive("Sesi")}
         >
           Detail Sesi
           <AppIcon name="solar:alt-arrow-right-linear" size={20} />
         </button>
-      </article>
+      </article> : <EmptyState title="Belum ada sesi mendatang" description="Temukan mentor untuk mulai belajar." />}
     </section>
   );
 }
 
-function TutorCard({ tutor, onProfile }) {
-  return (
-    <article className="tutor-card">
-      <div className="tutor-avatar">
-        <AppIcon name={tutor.avatar} size={98} />
-      </div>
-
-      <h3>{tutor.name}</h3>
-      <p className="tutor-subjects">{tutor.subjects}</p>
-
-      <div className="rating-line">
-        <AppIcon name="solar:star-bold" size={17} className="rating-star" />
-        <strong>{tutor.rating}</strong>
-        <span>({tutor.reviews})</span>
-        <span className={`tutor-badge ${tutor.roleClass}`}>{tutor.role}</span>
-      </div>
-
-      <div className="credit-line">
-        <AppIcon name="bx:coin-stack" size={15} />
-        <span>{tutor.credits} kredit / sesi</span>
-      </div>
-
-      <button className="outline-button profile-button" onClick={onProfile}>
-        Lihat Profil
-        <AppIcon name="solar:alt-arrow-right-linear" size={19} />
-      </button>
-    </article>
-  );
-}
-
-function TutorRecommendations() {
-  const [selectedTutor, setSelectedTutor] = useState(null);
+function TutorRecommendations({ onTutorProfile }) {
 
   return (
     <section className="recommendations-section">
-      <SectionHeading icon="fluent:hat-graduation-12-regular" title="Rekomendasi Tutor" />
+      <SectionHeading icon="fluent:hat-graduation-12-regular" title="Rekomendasi Mentor" />
 
       <div className="tutor-grid">
         {tutors.map((tutor) => (
-          <TutorCard key={tutor.name} tutor={tutor} onProfile={() => setSelectedTutor(tutor)} />
+          <MentorCard key={tutor.name} tutor={tutor} onProfile={() => onTutorProfile(tutor)} />
         ))}
       </div>
 
-      {selectedTutor && (
-        <div className="modal-backdrop" onClick={() => setSelectedTutor(null)}>
-          <div
-            className="profile-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="profile-modal-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              className="modal-close"
-              onClick={() => setSelectedTutor(null)}
-              aria-label="Tutup"
-            >
-              <AppIcon name="solar:close-circle-linear" size={25} />
-            </button>
-
-            <div className="tutor-avatar modal-avatar">
-              <AppIcon name={selectedTutor.avatar} size={90} />
-            </div>
-
-            <h2 id="profile-modal-title">{selectedTutor.name}</h2>
-            <p>{selectedTutor.subjects}</p>
-            <div className="modal-rating">
-              <AppIcon name="solar:star-bold" size={19} />
-              {selectedTutor.rating} ({selectedTutor.reviews} ulasan)
-            </div>
-
-            <p className="modal-description">
-              Tutor siap membantu kamu belajar dengan sesi yang terarah sesuai mata pelajaran
-              yang dikuasai.
-            </p>
-
-            <button
-              className="primary-button modal-action"
-              onClick={() => alert(`Permintaan sesi dengan ${selectedTutor.name}`)}
-            >
-              Ajukan Sesi
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
 
-function CreditCard() {
+export function CreditCard({ onHistory }) {
+  const { balance } = useTutorData();
+  const target = (Math.floor(balance / 50) + 1) * 50;
   return (
     <section className="panel credit-panel">
       <h3>Saldo Kredit</h3>
 
       <div className="credit-balance">
-        <strong>20</strong>
+        <strong>{balance}</strong>
         <span>kredit</span>
       </div>
 
-      <strong className="progress-label">20/50 kredit ke level berikutnya</strong>
+      <strong className="progress-label">{balance}/{target} kredit ke level berikutnya</strong>
 
       <div className="progress-track">
-        <div className="progress-fill" style={{ width: "40%" }} />
+        <div className="progress-fill" style={{ width: `${balance / target * 100}%` }} />
       </div>
 
-      <p className="helper-text">30 kredit lagi untuk mencapai threshold</p>
+      <p className="helper-text">{target - balance} kredit lagi ke level berikutnya</p>
 
-      <button className="primary-button full-button" onClick={() => alert("Riwayat kredit")}>
+      <button className="primary-button full-button" onClick={onHistory}>
         Lihat Riwayat Kredit
         <AppIcon name="solar:alt-arrow-right-linear" size={17} />
       </button>
@@ -264,20 +147,29 @@ function CreditCard() {
   );
 }
 
-function WeeklyProgress() {
-  const max = Math.max(...weeklyData.map((item) => item.value));
+export function WeeklyProgress() {
+  const { transactions } = useTutorData();
+  const monday = new Date();
+  monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+  const weeklyData = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((day, index) => {
+    const date = new Date(monday);
+    date.setDate(date.getDate() + index);
+    return { day, value: transactions.filter((item) => item.date === dateKey(date) && item.amount > 0).reduce((sum, item) => sum + item.amount, 0) };
+  });
+  const max = Math.max(1, ...weeklyData.map((item) => item.value));
+  const earned = weeklyData.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <section className="panel weekly-panel">
       <h3>Progres Mingguan</h3>
 
-      <strong className="progress-label">20/50 kredit</strong>
+      <strong className="progress-label">{earned}/50 kredit masuk</strong>
 
       <div className="progress-track weekly-progress">
-        <div className="progress-fill" style={{ width: "40%" }} />
+        <div className="progress-fill" style={{ width: `${Math.min(earned / 50, 1) * 100}%` }} />
       </div>
 
-      <p className="helper-text">30 kredit lagi untuk mencapai threshold</p>
+      <p className="helper-text">{earned >= 50 ? "Target mingguan tercapai!" : `${50 - earned} kredit lagi ke target mingguan`}</p>
 
       <div className="weekly-chart">
         <div className="chart-threshold" />
@@ -303,7 +195,7 @@ function WeeklyProgress() {
   );
 }
 
-function TeachBanner({ setActive }) {
+export function TeachBanner({ setActive }) {
   return (
     <section className="teach-banner">
       <div>
@@ -311,26 +203,26 @@ function TeachBanner({ setActive }) {
         <p>Bagikan ilmu yang kamu kuasai dan dapatkan kredit untuk belajar hal baru.</p>
       </div>
 
-      <button className="button-white teach-banner-button" onClick={() => setActive("Jadi tutor")}>
+      <button className="button-white teach-banner-button" onClick={() => setActive("Jadi mentor")}>
         <AppIcon name="fluent:hat-graduation-12-regular" size={23} />
-        Jadi tutor
+        Jadi mentor
       </button>
     </section>
   );
 }
 
-export default function Dashboard({ setActive }) {
+export default function Dashboard({ setActive, onTutorProfile }) {
   return (
     <div className="dashboard-layout">
       <div className="dashboard-main">
         <WelcomeBanner setActive={setActive} />
         <NextSession setActive={setActive} />
-        <TutorRecommendations />
+        <TutorRecommendations onTutorProfile={onTutorProfile} />
         <TeachBanner setActive={setActive} />
       </div>
 
       <aside className="dashboard-right">
-        <CreditCard />
+        <CreditCard onHistory={() => setActive("Riwayat Kredit")} />
         <WeeklyProgress />
       </aside>
     </div>

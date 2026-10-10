@@ -13,8 +13,8 @@ export default function SearchBar() {
         type="text"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
-        placeholder="Cari tutor atau mata pelajaran....."
-        aria-label="Cari tutor atau mata pelajaran"
+        placeholder="Cari mentor atau mata pelajaran..."
+        aria-label="Cari mentor atau mata pelajaran"
       />
 
       {search && (

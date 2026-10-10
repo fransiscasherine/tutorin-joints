@@ -3,15 +3,21 @@ import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
 import SearchBar from "./components/common/SearchBar";
 import AppIcon from "./components/common/AppIcon";
-import Dashboard from "./pages/Dashboardmentee/dashboard/Dashboard";
-import "./pages/mentee/Dashboard.css";
+import Dashboard from "./pages/mentee/dashboard/Dashboard";
+import "./pages/mentee/dashboard/Dashboard.css";
+import Profil from "./pages/mentee/profil mentee/Profil";
+import ProfilMentor from "./pages/mentee/profil mentor/ProfilMentor";
+import RiwayatKredit from "./pages/mentee/riwayat kredit/RiwayatKredit";
+import Sesi from "./pages/mentee/sesi/Sesi";
+import Shop from "./pages/mentee/shop/Shop";
+import Favorit from "./pages/mentee/favorit/Favorit";
 
 function AlternatePage({ active, setActive }) {
   const pages = {
-    "Cari tutor": {
+    "Cari mentor": {
       icon: "fa7-solid:search",
-      title: "Cari tutor",
-      description: "Temukan tutor yang sesuai dengan mata pelajaran yang kamu butuhkan.",
+      title: "Cari mentor",
+      description: "Temukan mentor yang sesuai dengan mata pelajaran yang kamu butuhkan.",
     },
     Sesi: {
       icon: "fa7-solid:calendar",
@@ -23,7 +29,7 @@ function AlternatePage({ active, setActive }) {
       title: "Akun saya",
       description: "Kelola informasi dan preferensi akunmu.",
     },
-    "Jadi tutor": {
+    "Jadi mentor": {
       icon: "fluent:hat-graduation-12-regular",
       title: "Mulai mengajar",
       description: "Bagikan keahlianmu, bantu pelajar lain, dan dapatkan kredit.",
@@ -50,23 +56,51 @@ function AlternatePage({ active, setActive }) {
 }
 
 export default function App() {
-  const [active, setActive] = useState("Beranda");
+  const [active, updateActive] = useState("Beranda");
+  const [selectedTutor, setSelectedTutor] = useState(null);
+  const [profileOrigin, setProfileOrigin] = useState("Beranda");
+
+  function setActive(page) {
+    updateActive(page);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function openTutor(tutor) {
+    setProfileOrigin(active);
+    setSelectedTutor(tutor);
+    setActive("Profil mentor");
+    window.scrollTo(0, 0);
+  }
 
   return (
     <div className="app-shell">
-      <Sidebar active={active} setActive={setActive} />
+      <Sidebar active={active === "Profil mentor" ? profileOrigin : active} setActive={setActive} />
 
       <main className="main-area">
         <div className="topbar-row">
           <SearchBar />
-          <Header />
+          <Header onProfileClick={() => setActive("Akun")} onShopClick={() => setActive("Shop")} />
         </div>
 
+        <div className="page-view" key={active}>
         {active === "Beranda" ? (
-          <Dashboard setActive={setActive} />
+          <Dashboard setActive={setActive} onTutorProfile={openTutor} />
+        ) : active === "Profil mentor" ? (
+          <ProfilMentor key={selectedTutor.name} tutor={selectedTutor} setActive={setActive} backPage={profileOrigin} />
+        ) : active === "Mentor Favorit" ? (
+          <Favorit onTutorProfile={openTutor} setActive={setActive} />
+        ) : active === "Akun" ? (
+          <Profil setActive={setActive} />
+        ) : active === "Sesi" ? (
+          <Sesi setActive={setActive} />
+        ) : active === "Riwayat Kredit" ? (
+          <RiwayatKredit setActive={setActive} />
+        ) : active === "Shop" ? (
+          <Shop setActive={setActive} />
         ) : (
           <AlternatePage active={active} setActive={setActive} />
         )}
+        </div>
       </main>
     </div>
   );

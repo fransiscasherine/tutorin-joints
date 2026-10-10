@@ -108,11 +108,19 @@
 }
 
 .mascot-scene {
-  height: 120px;
+  height: clamp(40px, calc(100dvh - 757px), 140px);
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.sidebar-mascot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 190px;
+  object-fit: contain;
 }
 
 .mascot-orbit {
