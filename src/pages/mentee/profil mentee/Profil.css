@@ -32,6 +32,7 @@
 }
 
 .profile-avatar {
+  overflow: hidden;
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -61,15 +62,23 @@
   overflow-wrap: anywhere;
 }
 
+.profile-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .profile-role {
   display: inline-block;
   padding: 4px 13px;
   border-radius: 20px;
-  background: var(--purple);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
 }
+
+.profile-role-mentee { background: var(--purple); }
+.profile-role-mentor { background: #27825b; }
 
 .profile-columns {
   display: grid;

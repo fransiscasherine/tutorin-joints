@@ -6,11 +6,13 @@ import { cancelSession, dateKey, formatDate, useTutorData } from "../../../state
 import "./Sesi.css";
 import SessionCalendar from "./SessionCalendar";
 import { endTime, isUpcomingSession, sessionCategory, sessionStatus } from "./sessionUtils";
+import { courseFor } from "../test/testData";
+import AssessmentAction from "../test/AssessmentAction";
 
-export default function Sesi({ setActive }) {
+export default function Sesi({ setActive, onOpenTest, initialRoleFilter = "Semua" }) {
   const { sessions } = useTutorData();
   const [tab, setTab] = useState("Mendatang");
-  const [roleFilter, setRoleFilter] = useState("Semua");
+  const [roleFilter, setRoleFilter] = useState(initialRoleFilter);
   const [selectedDate, setSelectedDate] = useState("");
   const [detail, setDetail] = useState(null);
   const [room, setRoom] = useState(false);
@@ -89,6 +91,10 @@ export default function Sesi({ setActive }) {
       <div className="activity-dialog-heading"><h2 id="session-dialog-title">{room ? "Ruang Sesi Demo" : "Detail Sesi"}</h2><button aria-label="Tutup" onClick={() => dialogRef.current.close()}><AppIcon name="solar:close-circle-linear" size={25} /></button></div>
       {detail && (room ? <div className="sessions-demo-room"><AppIcon name="solar:videocamera-record-linear" size={55} /><h3>{detail.subject}</h3><p>{detail.role === "mentor" ? `Mengajar ${detail.learner}` : `dengan mentor ${detail.tutor}`}</p><span>Sesi demo lokal</span><button className="activity-primary" onClick={() => { setRoom(false); }}>Keluar ruang<AppIcon name="solar:logout-2-linear" size={18} /></button></div> : <>
         <h3>{detail.subject}</h3><dl className="activity-pairs"><div><dt>Peran Anda</dt><dd>{detail.role === "mentor" ? "Mentor" : "Mentee"}</dd></div><div><dt>{detail.role === "mentor" ? "Mentee" : "Mentor"}</dt><dd>{detail.role === "mentor" ? detail.learner : detail.tutor}</dd></div><div><dt>Tanggal</dt><dd>{formatDate(detail.date)}</dd></div><div><dt>Waktu</dt><dd>{detail.time} - {endTime(detail)} WIB</dd></div><div><dt>{detail.role === "mentor" ? "Pendapatan sesi" : "Biaya sesi"}</dt><dd>{detail.credits} kredit</dd></div><div><dt>Status</dt><dd>{sessionStatus(detail)}</dd></div></dl>
+        {detail.role !== "mentor" && detail.status !== "Dibatalkan" && courseFor(detail.subject) && <div className="session-test-actions">
+          <AssessmentAction sessionId={detail.id} subject={detail.subject} mode="pre" buttonLabel="Pre-test" onClick={() => { dialogRef.current.close(); onOpenTest("pre", detail); }} />
+          <AssessmentAction sessionId={detail.id} subject={detail.subject} mode="post" buttonLabel="Post-test" onClick={() => { dialogRef.current.close(); onOpenTest("post", detail); }} />
+        </div>}
         {detail.status === "Dikonfirmasi" && isUpcomingSession(detail) && <button className="activity-primary sessions-room-button" onClick={() => setRoom(true)}><AppIcon name="solar:videocamera-record-linear" size={18} />Buka ruang demo</button>}
         {detail.status === "Menunggu konfirmasi" && <div className="sessions-cancel">{confirmCancel ? <><p>Batalkan permintaan sesi ini?</p><button className="activity-outline" onClick={() => setConfirmCancel(false)}>Kembali</button><button className="activity-primary" onClick={handleCancel}>Ya, batalkan</button></> : <button className="activity-outline" onClick={() => setConfirmCancel(true)}>Batalkan permintaan</button>}</div>}
       </>)}

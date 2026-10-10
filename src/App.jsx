@@ -15,13 +15,20 @@ import Shop from "./pages/mentee/shop/Shop";
 import Favorit from "./pages/mentee/favorit/Favorit";
 import BookingSesi from "./pages/mentee/booking sesi/BookingSesi";
 import DetailSesi from "./pages/mentee/detail sesi/DetailSesi";
+import PreTest from "./pages/mentee/test/PreTest";
+import PostTest from "./pages/mentee/test/PostTest";
+import { courseFor } from "./pages/mentee/test/testData";
+import { booking, tutor as bookingMentor } from "./pages/mentee/sessionData";
+import DashboardMentor from "./pages/mentor/dashboard/DashboardMentor";
+import { updateProfile, useProfile } from "./state/profile";
 
 import "./pages/mentee/dashboard/Dashboard.css";
 import "./pages/mentee/cari tutor/CariTutor.css";
 import "./pages/mentee/booking sesi/BookingSesi.css";
 import "./pages/mentee/detail sesi/DetailSesi.css";
 
-function AlternatePage({ active, setActive }) {
+function AlternatePage({ active, setActive, onActivateMentor }) {
+  const [error, setError] = useState("");
   const pages = {
     "Cari mentor": {
       icon: "fa7-solid:search",
@@ -48,6 +55,12 @@ function AlternatePage({ active, setActive }) {
       </div>
       <h1>{page.title}</h1>
       <p>{page.description}</p>
+      {active === "Jadi mentor" && <>
+        <button className="primary-button" onClick={() => {
+          try { onActivateMentor(); } catch { setError("Peran mentor belum tersimpan. Periksa izin penyimpanan browser."); }
+        }}><AppIcon name="fluent:hat-graduation-12-regular" size={20} />Aktifkan peran mentor</button>
+        <p role="status">{error}</p>
+      </>}
       <button
         className="primary-button"
         onClick={() => setActive("Beranda")}
@@ -60,13 +73,39 @@ function AlternatePage({ active, setActive }) {
 }
 
 export default function App() {
+  const profile = useProfile();
+  const [preferredMode, setPreferredMode] = useState(() => {
+    try { return localStorage.getItem("tutorin-dashboard-mode") === "mentor" ? "mentor" : "mentee"; }
+    catch { return "mentee"; }
+  });
+  const dashboardMode = profile.mentorActive ? preferredMode : "mentee";
   const [active, updateActive] = useState("Beranda");
   const [selectedTutor, setSelectedTutor] = useState(null);
   const [profileOrigin, setProfileOrigin] = useState("Beranda");
   const [bookingNote, setBookingNote] = useState("");
+  const [assessmentSession, setAssessmentSession] = useState(null);
+  const [assessmentOrigin, setAssessmentOrigin] = useState("Sesi");
 
   function setActive(page) {
+    if (dashboardMode === "mentor" && ["Shop", "Mentor Favorit"].includes(page)) return;
+    if (page === "Jadi mentor" && profile.mentorActive) { switchDashboard("mentor"); return; }
     updateActive(page);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function switchDashboard(mode) {
+    if (mode === "mentor" && !profile.mentorActive) { updateActive("Jadi mentor"); return; }
+    setPreferredMode(mode);
+    try { localStorage.setItem("tutorin-dashboard-mode", mode); } catch { /* Mode switching still works without saved preferences. */ }
+    updateActive("Beranda");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function activateMentor() {
+    updateProfile({ ...profile, mentorActive: true });
+    setPreferredMode("mentor");
+    try { localStorage.setItem("tutorin-dashboard-mode", "mentor"); } catch { /* The role itself was already saved. */ }
+    updateActive("Beranda");
     window.scrollTo({ top: 0, behavior: "instant" });
   }
 
@@ -76,7 +115,13 @@ export default function App() {
     setActive("Profil mentor");
   }
 
-  const sessionPages = ["Booking Sesi", "Detail Sesi"];
+  function openTest(mode, session) {
+    setAssessmentSession(session);
+    setAssessmentOrigin(active);
+    setActive(mode === "pre" ? "Pre-test" : "Post-test");
+  }
+
+  const sessionPages = ["Booking Sesi", "Detail Sesi", "Pre-test", "Post-test"];
 
   return (
     <div className="app-shell">
@@ -89,6 +134,9 @@ export default function App() {
               : active
         }
         setActive={setActive}
+        isMentor={profile.mentorActive}
+        dashboardMode={dashboardMode}
+        onSwitchMode={switchDashboard}
       />
 
       <main className="main-area">
@@ -96,12 +144,14 @@ export default function App() {
           <SearchBar />
           <Header
             onProfileClick={() => setActive("Akun")}
-            onShopClick={() => setActive("Shop")}
+            onShopClick={dashboardMode === "mentee" ? () => setActive("Shop") : undefined}
           />
         </div>
 
-        <div className="page-view" key={active}>
-          {active === "Beranda" ? (
+        <div className="page-view" key={`${active}-${dashboardMode}`}>
+          {active === "Beranda" && dashboardMode === "mentor" ? (
+            <DashboardMentor onSessions={() => setActive("Sesi")} onHistory={() => setActive("Riwayat Kredit")} onSwitchMode={switchDashboard} />
+          ) : active === "Beranda" ? (
             <Dashboard
               setActive={setActive}
               onTutorProfile={openTutor}
@@ -128,9 +178,15 @@ export default function App() {
           ) : active === "Akun" ? (
             <Profil setActive={setActive} />
           ) : active === "Sesi" ? (
-            <Sesi setActive={setActive} />
+            <Sesi setActive={setActive} onOpenTest={openTest} initialRoleFilter={dashboardMode === "mentor" ? "Mengajar" : "Semua"} />
+          ) : active === "Pre-test" && assessmentSession ? (
+            <PreTest key={`${assessmentSession.id}-pre`} session={assessmentSession} courseId={courseFor(assessmentSession.subject)}
+              onBack={() => setActive(assessmentOrigin)} onPostTest={() => setActive("Post-test")} />
+          ) : active === "Post-test" && assessmentSession ? (
+            <PostTest key={`${assessmentSession.id}-post`} session={assessmentSession} courseId={courseFor(assessmentSession.subject)}
+              onBack={() => setActive(assessmentOrigin)} />
           ) : active === "Riwayat Kredit" ? (
-            <RiwayatKredit setActive={setActive} />
+            <RiwayatKredit setActive={setActive} dashboardMode={dashboardMode} />
           ) : active === "Shop" ? (
             <Shop setActive={setActive} />
           ) : active === "Booking Sesi" ? (
@@ -145,11 +201,12 @@ export default function App() {
           ) : active === "Detail Sesi" ? (
             <DetailSesi
               bookingNote={bookingNote}
+              onOpenTest={(mode) => openTest(mode, { id: booking.code, subject: booking.topic, tutor: bookingMentor.name })}
               onBack={() => setActive("Sesi")}
               onTeach={() => setActive("Jadi mentor")}
             />
           ) : (
-            <AlternatePage active={active} setActive={setActive} />
+            <AlternatePage active={active} setActive={setActive} onActivateMentor={activateMentor} />
           )}
         </div>
       </main>

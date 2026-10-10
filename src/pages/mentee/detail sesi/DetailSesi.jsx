@@ -1,5 +1,6 @@
 import AppIcon from "../../../components/common/AppIcon";
 import { booking, tutor } from "../sessionData";
+import AssessmentAction from "../test/AssessmentAction";
 
 function TutorSummary() {
   return (
@@ -73,17 +74,14 @@ function DetailItem({ icon, label, value }) {
   );
 }
 
-function EvaluationItem({ item, buttonLabel }) {
+function EvaluationItem({ item, buttonLabel, onClick, mode }) {
   return (
     <article className="evaluation-item">
       <div>
         <h3>{item.title}</h3>
         <p>{item.description}</p>
       </div>
-      <button className="primary-button evaluation-button" type="button">
-        {buttonLabel}
-        <AppIcon name="solar:external-link-linear" size={18} />
-      </button>
+      <AssessmentAction sessionId={booking.code} subject={booking.topic} mode={mode} onClick={onClick} buttonLabel={buttonLabel} buttonClass="primary-button evaluation-button" />
     </article>
   );
 }
@@ -103,7 +101,7 @@ function TeachBanner({ onTeach }) {
   );
 }
 
-export default function DetailSesi({ bookingNote, onBack, onTeach }) {
+export default function DetailSesi({ bookingNote, onBack, onTeach, onOpenTest }) {
   const sessionTime = `${booking.initialTime} ${booking.timezone}`;
   const sessionSchedule = `${booking.availableDate} • ${sessionTime}`;
   const noteText = bookingNote.trim() || booking.emptyNote;
@@ -150,8 +148,8 @@ export default function DetailSesi({ bookingNote, onBack, onTeach }) {
               <span>*Wajib</span>
             </div>
 
-            <EvaluationItem item={booking.preTest} buttonLabel={`Buka ${booking.preTest.title.toLowerCase()}`} />
-            <EvaluationItem item={booking.postTest} buttonLabel={`Buka ${booking.postTest.title.toLowerCase()}`} />
+            <EvaluationItem item={booking.preTest} mode="pre" buttonLabel={`Buka ${booking.preTest.title.toLowerCase()}`} onClick={() => onOpenTest("pre")} />
+            <EvaluationItem item={booking.postTest} mode="post" buttonLabel={`Buka ${booking.postTest.title.toLowerCase()}`} onClick={() => onOpenTest("post")} />
           </section>
 
           <TeachBanner onTeach={onTeach} />

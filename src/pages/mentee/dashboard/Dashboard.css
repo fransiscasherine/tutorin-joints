@@ -245,6 +245,10 @@
   color: var(--navy);
 }
 
+.search-box input:focus-visible {
+  outline: none;
+}
+
 .search-box input::placeholder {
   color: #858585;
 }
@@ -291,11 +295,24 @@
 
 .user-chip strong {
   font-size: 15px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-avatar {
   width: 37px;
   height: 37px;
+  overflow: hidden;
+}
+
+.user-avatar img, .profile-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
 }
 
 .notification-wrap {

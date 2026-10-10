@@ -7,7 +7,7 @@ import "./RiwayatKredit.css";
 
 const pageSize = 4;
 
-export default function RiwayatKredit({ setActive }) {
+export default function RiwayatKredit({ setActive, dashboardMode = "mentee" }) {
   const { transactions } = useTutorData();
   const [filter, setFilter] = useState("Semua");
   const [page, setPage] = useState(1);
@@ -29,7 +29,7 @@ export default function RiwayatKredit({ setActive }) {
   return <div className="activity-layout credit-history-page">
     <div className="activity-main">
       <div className="activity-heading"><h1>Riwayat Kredit</h1><p>Pantau seluruh aktivitas kredit Anda dalam satu tempat.</p></div>
-      <BalanceBanner onShop={() => setActive("Shop")} />
+      <BalanceBanner onShop={dashboardMode === "mentee" ? () => setActive("Shop") : undefined} />
       <div className="activity-tabs" aria-label="Filter transaksi">
         {["Semua", "Pengeluaran", "Pemasukan"].map((label) => <button key={label} aria-pressed={filter === label}
           onClick={() => { setFilter(label); setPage(1); }}>{label}</button>)}
@@ -48,7 +48,7 @@ export default function RiwayatKredit({ setActive }) {
         {Array.from({ length: pageCount }, (_, index) => <button key={index} aria-current={currentPage === index + 1 ? "page" : undefined} onClick={() => setPage(index + 1)}>{index + 1}</button>)}
         <button disabled={currentPage === pageCount} aria-label="Halaman berikutnya" onClick={() => setPage(currentPage + 1)}><AppIcon name="solar:alt-arrow-right-linear" size={18} /></button>
       </nav>}
-      <div className="activity-banner-footer"><TeachBanner setActive={setActive} /></div>
+      {dashboardMode === "mentee" && <div className="activity-banner-footer"><TeachBanner setActive={setActive} /></div>}
     </div>
   </div>;
 }

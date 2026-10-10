@@ -1,12 +1,8 @@
 import { useState } from "react";
 import AppIcon from "../../../components/common/AppIcon";
 import "./Profil.css";
-
-const initialProfile = {
-  firstName: "Alya", lastName: "Putri", email: "alya.putri@email.com",
-  phone: "+62 812 3456 7890", city: "Jakarta, Indonesia",
-  birthday: "2000-05-15", username: "alyaputri123",
-};
+import profilePicture from "../../../assets/alya-profile.avif";
+import { updateProfile, useProfile } from "../../../state/profile";
 
 const fields = [
   { key: "firstName", label: "Nama depan", autoComplete: "given-name" },
@@ -18,17 +14,6 @@ const fields = [
   { key: "username", label: "Username", autoComplete: "username" },
 ];
 
-function loadProfile() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("tutorin-profile"));
-    return Object.fromEntries(Object.entries(initialProfile).map(([key, value]) => [
-      key, typeof saved?.[key] === "string" ? saved[key] : value,
-    ]));
-  } catch {
-    return initialProfile;
-  }
-}
-
 function formatBirthday(value) {
   const date = new Date(`${value}T00:00:00`);
   return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("id-ID", {
@@ -37,21 +22,20 @@ function formatBirthday(value) {
 }
 
 export default function Profil({ setActive }) {
-  const [profile, setProfile] = useState(loadProfile);
+  const profile = useProfile();
   const [draft, setDraft] = useState(profile);
   const [editing, setEditing] = useState(false);
   const [message, setMessage] = useState("");
 
   function saveProfile(event) {
     event.preventDefault();
-    const next = Object.fromEntries(Object.entries(draft).map(([key, value]) => [key, value.trim()]));
+    const next = Object.fromEntries(fields.map(({ key }) => [key, draft[key].trim()]));
     if (Object.values(next).some((value) => !value)) {
       setMessage("Lengkapi semua data diri terlebih dahulu.");
       return;
     }
     try {
-      localStorage.setItem("tutorin-profile", JSON.stringify(next));
-      setProfile(next);
+      updateProfile({ ...profile, ...next });
       setEditing(false);
       setMessage("Profil berhasil disimpan.");
     } catch {
@@ -67,12 +51,15 @@ export default function Profil({ setActive }) {
       </div>
       <section className="profile-summary" aria-label="Ringkasan profil">
         <div className="profile-avatar" aria-hidden="true">
-          {profile.firstName.slice(0, 1)}{profile.lastName.slice(0, 1)}
+          <img src={profilePicture} alt="" width="90" height="90" />
         </div>
         <div className="profile-identity">
           <h2>{profile.firstName} {profile.lastName}</h2>
           <p>{profile.email}</p>
-          <span className="profile-role">Mentee &amp; Mentor</span>
+          <div className="profile-roles" aria-label="Peran akun">
+            <span className="profile-role profile-role-mentee">Mentee</span>
+            {profile.mentorActive && <span className="profile-role profile-role-mentor">Mentor</span>}
+          </div>
         </div>
       </section>
       <div className="profile-columns">
@@ -123,10 +110,10 @@ export default function Profil({ setActive }) {
           </form>
         </section>
         <section className="profile-mentor" aria-labelledby="profile-mentor-title">
-          <h2 id="profile-mentor-title">Peran mentor aktif</h2>
-          <p>Kelola sesi mengajar, bantu mentee lain, dan dapatkan kredit tambahan.</p>
-          <button type="button" className="profile-button" onClick={() => setActive("Sesi")}>
-            Kelola sesi<AppIcon name="solar:alt-arrow-right-linear" size={18} />
+          <h2 id="profile-mentor-title">{profile.mentorActive ? "Peran mentor aktif" : "Jadi mentor"}</h2>
+          <p>{profile.mentorActive ? "Kelola sesi mengajar, bantu mentee lain, dan dapatkan kredit tambahan." : "Bagikan keahlianmu, bantu mentee lain, dan dapatkan kredit tambahan."}</p>
+          <button type="button" className="profile-button" onClick={() => setActive("Jadi mentor")}>
+            {profile.mentorActive ? "Dashboard mentor" : "Mulai mengajar"}<AppIcon name={profile.mentorActive ? "solar:transfer-horizontal-linear" : "solar:alt-arrow-right-linear"} size={18} />
           </button>
         </section>
       </div>

@@ -5,13 +5,15 @@ import { dateKey, formatDate, useTutorData } from "../../../state/tutorStore";
 import { EmptyState } from "../../../components/common/ActivityUI";
 import { tutors } from "../../../state/tutors";
 import { isUpcomingSession } from "../sesi/sessionUtils";
+import { useProfile } from "../../../state/profile";
 
 function WelcomeBanner({ setActive }) {
+  const profile = useProfile();
   return (
     <section className="welcome-banner">
       <div className="welcome-content">
         <h1>
-          Halo, <span>User!</span>
+          Halo, <span>{profile.firstName} {profile.lastName}!</span>
         </h1>
         <p>
           Belajar sesuatu yang baru, atau bagikan ilmu yang

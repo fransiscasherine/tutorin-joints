@@ -8,14 +8,14 @@ export default function Header({ onProfileClick, onShopClick }) {
   return (
     <header className="topbar">
       <div className="header-actions">
-        <button
+        {onShopClick && <button
           className="icon-button"
           aria-label="Shop Kredit"
           title="Shop Kredit"
           onClick={onShopClick}
         >
           <AppIcon name="solar:shop-2-bold" size={23} />
-        </button>
+        </button>}
 
         <div className="notification-wrap">
           <button

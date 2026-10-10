@@ -7,11 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test:assessments": "node --test tests/assessment.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "@fontsource-variable/sn-pro": "^5.3.0",
     "@iconify/react": "^6.0.2",
+    "crossword-layout-generator": "^0.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

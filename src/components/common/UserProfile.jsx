@@ -1,12 +1,15 @@
-import AppIcon from "./AppIcon";
+import profilePicture from "../../assets/alya-profile.avif";
+import { useProfile } from "../../state/profile";
 
 export default function UserProfile({ onClick }) {
+  const profile = useProfile();
+  const fullName = `${profile.firstName} ${profile.lastName}`;
   return (
-    <button className="user-chip" onClick={onClick} aria-label="Buka profil saya">
+    <button className="user-chip" onClick={onClick} aria-label={`Buka profil ${fullName}`} title={fullName}>
       <span className="user-avatar">
-        <AppIcon name="solar:user-bold" size={24} />
+        <img src={profilePicture} alt="" width="37" height="37" />
       </span>
-      <strong>User</strong>
+      <strong>{fullName}</strong>
     </button>
   );
 }

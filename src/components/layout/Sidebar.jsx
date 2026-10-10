@@ -12,7 +12,9 @@ const menu = [
   { label: "Akun", icon: "fa7-solid:user" },
 ];
 
-export default function Sidebar({ active, setActive }) {
+export default function Sidebar({ active, setActive, isMentor, dashboardMode, onSwitchMode }) {
+  const targetMode = dashboardMode === "mentor" ? "mentee" : "mentor";
+  const roleLabel = isMentor ? `Dashboard ${targetMode}` : "Mulai Mengajar";
   return (
     <aside className="sidebar">
       <div className="brand-row">
@@ -34,7 +36,7 @@ export default function Sidebar({ active, setActive }) {
       </div>
 
       <nav className="side-nav">
-        {menu.map((item) => (
+        {menu.filter((item) => dashboardMode !== "mentor" || !["Mentor Favorit", "Shop"].includes(item.label)).map((item) => (
           <NavbarItem
             key={item.label}
             item={item}
@@ -44,15 +46,19 @@ export default function Sidebar({ active, setActive }) {
         ))}
       </nav>
 
-      <div className="teach-card">
+      <div className="teach-card sidebar-role-area">
+        <div className="sidebar-teach-content">
         <div className="mascot-scene"><img className="sidebar-mascot" src={mascot} alt="" width="139" height="116" /></div>
 
         <h3>Bersama, kita saling tumbuh!</h3>
         <p>Ajarkan apa yang kamu kuasai, pelajari apa yang kamu butuhkan.</p>
+        </div>
 
-        <button className="mini-cta" onClick={() => setActive("Jadi mentor")}>
-          Mulai Mengajar
-          <AppIcon name="solar:alt-arrow-right-linear" size={17} />
+        <button className={`mini-cta sidebar-role-switch ${isMentor ? `to-${targetMode}` : ""}`} aria-label={roleLabel} title={roleLabel}
+          onClick={() => isMentor ? onSwitchMode(targetMode) : setActive("Jadi mentor")}>
+          {isMentor && <AppIcon name="solar:transfer-horizontal-linear" size={19} />}
+          <span>{roleLabel}</span>
+          {!isMentor && <AppIcon name="solar:alt-arrow-right-linear" size={17} />}
         </button>
       </div>
     </aside>

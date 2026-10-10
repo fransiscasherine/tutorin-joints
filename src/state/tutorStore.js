@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { getMentorProgress } from "./mentorProgress";
 
 const storageKey = "tutorin-activity-v1";
 const listeners = new Set();
@@ -91,4 +92,11 @@ export function completeDemoPurchase(order) {
 }
 export function formatDate(value, options = {}) {
   return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric", ...options }).format(new Date(`${value}T00:00:00`));
+}
+export function claimMentorMission(id) {
+  const mission = getMentorProgress(snapshot).missions.find((item) => item.id === id);
+  if (!mission || mission.claimed || mission.value < mission.target) return false;
+  commit({ ...snapshot, transactions: [{ id: mission.claimId, title: `Hadiah misi mentor - ${mission.title}`,
+    detail: "Misi mingguan selesai", amount: mission.reward, date: dateKey(new Date()) }, ...snapshot.transactions] });
+  return true;
 }
