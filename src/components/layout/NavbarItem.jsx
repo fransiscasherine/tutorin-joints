@@ -1,4 +1,4 @@
-import AppIcon from "../Common/AppIcon";
+import AppIcon from "../common/AppIcon";
 
 export default function NavbarItem({ item, active, onSelect }) {
   return (

@@ -1,4 +1,4 @@
-import AppIcon from "../Common/AppIcon";
+import AppIcon from "../common/AppIcon";
 import NavbarItem from "./NavbarItem";
 
 const menu = [

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import Sidebar from "./component/navbar/Sidebar";
-import Header from "./component/header/Header";
-import SearchBar from "./component/Common/SearchBar";
-import AppIcon from "./component/Common/AppIcon";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import "./pages/Dashboard/Dashboard.css";
+import Sidebar from "./components/layout/Sidebar";
+import Header from "./components/layout/Header";
+import SearchBar from "./components/common/SearchBar";
+import AppIcon from "./components/common/AppIcon";
+import Dashboard from "./pages/Dashboardmentee/dashboard/Dashboard";
+import "./pages/mentee/Dashboard.css";
 
 function AlternatePage({ active, setActive }) {
   const pages = {

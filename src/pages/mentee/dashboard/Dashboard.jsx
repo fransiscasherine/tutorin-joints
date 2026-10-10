@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AppIcon from "../../component/Common/AppIcon";
+import AppIcon from "../../../components/common/AppIcon";
 
 const tutors = [
   {

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AppIcon from "../Common/AppIcon";
-import UserProfile from "../Common/UserProfile";
+import AppIcon from "../common/AppIcon";
+import UserProfile from "../common/UserProfile";
 
 export default function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
