@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AppIcon from "../common/AppIcon";
 import NavbarItem from "./NavbarItem";
 import mascot from "../../assets/mascot.png";
@@ -13,6 +14,7 @@ const menu = [
 ];
 
 export default function Sidebar({ active, setActive, isMentor, dashboardMode, onSwitchMode }) {
+  const [collapsed, setCollapsed] = useState(() => document.body.classList.contains("sidebar-collapsed"));
   const targetMode = dashboardMode === "mentor" ? "mentee" : "mentor";
   const roleLabel = isMentor ? `Dashboard ${targetMode}` : "Mulai Mengajar";
   return (
@@ -22,21 +24,26 @@ export default function Sidebar({ active, setActive, isMentor, dashboardMode, on
           <AppIcon name="fa7-solid:user" size={27} />
         </div>
 
-        <a className="brand" href="#" onClick={() => setActive("Beranda")}>
-          Tutor<span>.in</span>
-        </a>
-
         <button
           className="collapse-btn"
-          aria-label="Tutup sidebar"
-          onClick={() => document.body.classList.toggle("sidebar-collapsed")}
+          aria-label={collapsed ? "Buka sidebar" : "Tutup sidebar"}
+          title={collapsed ? "Buka sidebar" : "Tutup sidebar"}
+          aria-expanded={!collapsed}
+          onClick={() => {
+            const next = !collapsed;
+            document.body.classList.toggle("sidebar-collapsed", next);
+            setCollapsed(next);
+          }}
         >
-          <AppIcon name="solar:alt-arrow-left-bold" size={22} />
+          <AppIcon name={collapsed ? "solar:alt-arrow-right-linear" : "solar:alt-arrow-left-linear"} size={20} />
         </button>
+        <a className="brand" href="#" onClick={(event) => { event.preventDefault(); setActive("Beranda"); }}>
+          Tutor<span>.in</span>
+        </a>
       </div>
 
       <nav className="side-nav">
-        {menu.filter((item) => dashboardMode !== "mentor" || !["Mentor Favorit", "Shop"].includes(item.label)).map((item) => (
+        {menu.filter((item) => dashboardMode !== "mentor" || !["Cari mentor", "Mentor Favorit", "Shop"].includes(item.label)).map((item) => (
           <NavbarItem
             key={item.label}
             item={item}

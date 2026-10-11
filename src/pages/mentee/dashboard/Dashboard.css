@@ -20,7 +20,7 @@
 .brand-row {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 6px;
   padding: 0 10px;
   min-height: 53px;
 }
@@ -58,10 +58,17 @@
   border: 0;
   background: transparent;
   color: var(--purple);
-  padding: 4px;
-  margin-left: auto;
+  padding: 0;
+  margin-left: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 36px;
+  border-radius: 8px;
 }
+.collapse-btn:hover { background: #eee8ff; }
 
 .side-nav {
   display: flex;
@@ -1058,6 +1065,7 @@
 .sidebar-collapsed .brand-row {
   padding: 0;
   justify-content: center;
+  gap: 2px;
 }
 
 .sidebar-collapsed .brand,
@@ -1067,13 +1075,12 @@
 }
 
 .sidebar-collapsed .collapse-btn {
-  position: absolute;
-  right: 3px;
-  top: 78px;
+  position: static;
+  width: 24px;
 }
 
 .sidebar-collapsed .side-nav {
-  margin-top: 62px;
+  margin-top: 35px;
 }
 
 .sidebar-collapsed .nav-item {
