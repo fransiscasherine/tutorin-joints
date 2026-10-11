@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import LandingPage from "./pages/landing/LandingPage";
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
 import SearchBar from "./components/common/SearchBar";
@@ -73,6 +74,12 @@ function AlternatePage({ active, setActive, onActivateMentor }) {
 }
 
 export default function App() {
+  const [entered, setEntered] = useState(() => window.location.hash === "#dashboard");
+  useEffect(() => {
+    const onHashChange = () => setEntered(window.location.hash === "#dashboard");
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
   const profile = useProfile();
   const [preferredMode, setPreferredMode] = useState(() => {
     try { return localStorage.getItem("tutorin-dashboard-mode") === "mentor" ? "mentor" : "mentee"; }
@@ -122,6 +129,13 @@ export default function App() {
   }
 
   const sessionPages = ["Booking Sesi", "Detail Sesi", "Pre-test", "Post-test"];
+
+  if (!entered) return <LandingPage onChooseRole={(mode) => {
+    switchDashboard(mode);
+    window.location.hash = "dashboard";
+    setEntered(true);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }} />;
 
   return (
     <div className="app-shell">
